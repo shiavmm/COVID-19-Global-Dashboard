@@ -326,7 +326,9 @@ const ChartsModule = (() => {
         destroyChart(canvasId);
         const numValue = parseFloat(value) || 0;
 
-        const ctx = document.getElementById(canvasId).getContext('2d');
+        const canvasEl = document.getElementById(canvasId);
+        if (!canvasEl) return;
+        const ctx = canvasEl.getContext('2d');
         instances[canvasId] = new Chart(ctx, {
             type: 'doughnut',
             data: {
@@ -356,7 +358,8 @@ const ChartsModule = (() => {
 
         // Update label
         if (labelId) {
-            document.getElementById(labelId).textContent = numValue + '%';
+            const lbl = document.getElementById(labelId);
+            if (lbl) lbl.textContent = numValue + '%';
         }
     }
 
