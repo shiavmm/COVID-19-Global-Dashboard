@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="COVID-19 Global Dashboard — Comprehensive analysis of COVID impact worldwide with interactive charts, maps, and filters.">
+    <title>COVID-19 Global Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-view="overview" id="nav-overview">
+                <div class="nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <span class="nav-label">Overview</span>
+            </a>
+            <a href="#" class="nav-item" data-view="country" id="nav-country">
+                <div class="nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </div>
+                <span class="nav-label">Country<br>Analysis</span>
+            </a>
+            <a href="#" class="nav-item" data-view="vaccination" id="nav-vaccination">
+                <div class="nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <span class="nav-label">Vaccination<br>Analysis</span>
+            </a>
+            <a href="#" class="nav-item" data-view="population" id="nav-population">
+                <div class="nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <span class="nav-label">Population<br>Analysis</span>
+            </a>
+        </nav>
+        <div class="sidebar-bottom">
+            <a href="#" class="nav-item" data-view="about" id="nav-about">
+                <div class="nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                </div>
+                <span class="nav-label">About<br>Dashboard</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+
+        <!-- ===== HEADER ===== -->
+        <header class="header" id="header">
+            <div class="header-left">
+                <div class="header-logo-icon">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                        <circle cx="8" cy="8" r="1.5" fill="currentColor" opacity="0.5"/>
+                        <circle cx="15" cy="10" r="1" fill="currentColor" opacity="0.5"/>
+                        <circle cx="10" cy="15" r="1.2" fill="currentColor" opacity="0.5"/>
+                    </svg>
+                </div>
+                <div class="header-text">
+                    <h1>COVID-19 Global Dashboard</h1>
+                    <p>Comprehensive analysis of COVID impact worldwide</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="last-updated">
+                    <span class="updated-label">Last Updated</span>
+                    <span class="updated-date" id="last-updated-date">05 August 2026</span>
+                </div>
+                <button class="btn-reset" id="btn-reset-filters">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                    Reset Filters
+                </button>
+            </div>
+        </header>
+
+        <!-- ===== VIEW: OVERVIEW ===== -->
+        <section class="view active" id="view-overview">
+
+            <!-- KPI Cards -->
+            <div class="kpi-row" id="kpi-row">
+                <div class="kpi-card" id="kpi-population">
+                    <div class="kpi-icon" style="background: #EBF5FF; color: #3B82F6;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <div class="kpi-content">
+                        <span class="kpi-label">Population</span>
+                        <span class="kpi-value" id="kpi-pop-value">—</span>
+                        <span class="kpi-sub">Total Population</span>
+                    </div>
+                </div>
+                <div class="kpi-card" id="kpi-cases">
+                    <div class="kpi-icon" style="background: #FEF3C7; color: #F59E0B;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6"></circle><line x1="12" y1="2" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="22"></line><line x1="2" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"></line><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"></line><line x1="19.07" y1="4.93" x2="17.66" y2="6.34"></line><line x1="6.34" y1="17.66" x2="4.93" y2="19.07"></line></svg>
+                    </div>
+                    <div class="kpi-content">
+                        <span class="kpi-label">Total Cases</span>
+                        <div style="display: flex; align-items: baseline; gap: 4px;">
+                            <span class="kpi-value" id="kpi-cases-value">—</span>
+                            <span class="kpi-delta positive" id="kpi-cases-delta"></span>
+                        </div>
+                        <span class="kpi-sub">from last update</span>
+                    </div>
+                </div>
+                <div class="kpi-card" id="kpi-deaths">
+                    <div class="kpi-icon" style="background: #FEE2E2; color: #EF4444;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h.01M15 12h.01M12 2a8 8 0 0 0-8 8v1a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4v-1a8 8 0 0 0-8-8z"></path><path d="M10 18a1 1 0 0 0 1-1v-1h2v1a1 1 0 0 0 1-1h2a1 1 0 0 0 1-1v-2H7v2a1 1 0 0 0 1-1h2z"></path></svg>
+                    </div>
+                    <div class="kpi-content">
+                        <span class="kpi-label">Total Deaths</span>
+                        <span class="kpi-value" id="kpi-deaths-value">—</span>
+                        <span class="kpi-sub"><span class="kpi-delta negative" id="kpi-deaths-delta"></span> <span style="color: #64748B;">from last update</span></span>
+                    </div>
+                </div>
+                <div class="kpi-card" id="kpi-recovered">
+                    <div class="kpi-icon" style="background: #D1FAE5; color: #10B981;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    </div>
+                    <div class="kpi-content">
+                        <span class="kpi-label">Recovered</span>
+                        <div style="display: flex; align-items: baseline; gap: 4px;">
+                            <span class="kpi-value" id="kpi-recovered-value">—</span>
+                            <span class="kpi-delta positive" id="kpi-recovered-delta"></span>
+                        </div>
+                        <span class="kpi-sub">from last update</span>
+                    </div>
+                </div>
+                <div class="kpi-card" id="kpi-vaccination">
+                    <div class="kpi-icon" style="background: #EDE9FE; color: #8B5CF6;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 2 4 4M17 7l-9 9H5v-3l9-9zM3 21l3-3M9.5 9.5l4 4"></path></svg>
+                    </div>
+                    <div class="kpi-content">
+                        <span class="kpi-label">Vaccination Rate</span>
+                        <span class="kpi-value" id="kpi-vacc-value">—</span>
+                        <span class="kpi-sub">of total population</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: Map + Donut + Filters -->
+            <div class="content-row row-map">
+                <div class="card card-map" id="card-map">
+                    <div class="card-header">
+                        <h3>COVID-19 Cases by Country</h3>
+                        <span class="badge-graph-type">INTERACTIVE MAP</span>
+                    </div>
+                    <div class="card-body">
+                        <div id="map-container"></div>
+                        <div class="map-legend">
+                            <span class="legend-item"><span class="legend-dot high"></span> High (&gt; 10M)</span>
+                            <span class="legend-item"><span class="legend-dot medium"></span> Medium (1M - 10M)</span>
+                            <span class="legend-item"><span class="legend-dot low"></span> Low (&lt; 1M)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-donut" id="card-donut">
+                    <div class="card-header">
+                        <h3>Cases by Continent</h3>
+                        <span class="badge-graph-type">DONUT CHART</span>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="chart-donut"></canvas>
+                    </div>
+                </div>
+                <div class="card card-filters" id="card-filters">
+                    <div class="card-header filters-header">
+                        <h3>Filters</h3>
+                        <button class="btn-collapse" id="btn-collapse-filters">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+                        </button>
+                    </div>
+                    <div class="card-body filters-body" id="filters-body">
+                        <div class="filter-group">
+                            <label for="filter-continent">Continent</label>
+                            <select id="filter-continent">
+                                <option value="All">All</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filter-country">Country</label>
+                            <select id="filter-country">
+                                <option value="All">All</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filter-year">Year</label>
+                            <select id="filter-year">
+                                <option value="All">All</option>
+                                <option value="2020">2020</option>
+                                <option value="2021">2021</option>
+                                <option value="2022">2022</option>
+                                <option value="2023">2023</option>
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                            </select>
+                        </div>
+                        <button class="btn-apply" id="btn-apply-filters">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                            Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3: Bar Charts + Line Chart -->
+            <div class="content-row row-charts">
+                <div class="card card-bar-h" id="card-top10">
+                    <div class="card-header">
+                        <h3>Top 10 Countries by Total Cases</h3>
+                        <span class="badge-graph-type">HORIZONTAL BAR CHART</span>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="chart-top10"></canvas>
+                    </div>
+                </div>
+                <div class="card card-bar-v" id="card-vacc-continent">
+                    <div class="card-header">
+                        <h3>Vaccination Rate by Continent</h3>
+                        <span class="badge-graph-type">POLAR AREA CHART</span>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="chart-vacc-continent"></canvas>
+                    </div>
+                </div>
+                <div class="card card-line" id="card-timeline">
+                    <div class="card-header">
+                        <h3>Cases Over Time (Global)</h3>
+                        <span class="badge-graph-type">LINE CHART</span>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="chart-timeline"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 4: Table + Gauge -->
+            <div class="content-row row-bottom">
+                <div class="card card-table" id="card-table">
+                    <div class="card-header">
+                        <h3>Country Summary</h3>
+                        <span class="badge-graph-type">TABLE HEATMAP</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-wrapper">
+                            <table id="summary-table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-left">Country</th>
+                                        <th class="text-right">Population</th>
+                                        <th class="text-right">Total Cases</th>
+                                        <th class="text-right">Total Deaths</th>
+                                        <th class="text-right">Recovered</th>
+                                        <th class="text-center">Vaccination Rate (%)</th>
+                                        <th class="text-center">Death Rate (%)</th>
+                                        <th class="text-center">Recovery Rate (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="summary-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-gauge" id="card-gauge">
+                    <div class="card-header">
+                        <h3>Vaccination Progress (Global)</h3>
+                        <span class="badge-graph-type">GAUGE CHART</span>
+                    </div>
+                    <div class="card-body gauge-body">
+                        <canvas id="chart-gauge"></canvas>
+                        <div class="gauge-label">
+                            <span class="gauge-value" id="gauge-value">—</span>
+                            <span class="gauge-sub">of Total Population</span>
+                        </div>
+                        <div class="gauge-range">
+                            <span>0%</span>
+                            <span>100%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== VIEW: COUNTRY ANALYSIS ===== -->
+        <section class="view" id="view-country">
+            <div class="view-header-bar">
+                <h2>Country Analysis</h2>
+                <p>Detailed breakdown by individual countries</p>
+            </div>
+            <div class="content-row">
+                <div class="card" style="flex:1;">
+                    <div class="card-header">
+                        <h3>Cases vs Deaths by Country</h3>
+                        <span class="badge-graph-type">GROUPED BAR CHART</span>
+                    </div>
+                    <div class="card-body"><canvas id="chart-country-compare"></canvas></div>
+                </div>
+                <div class="card" style="flex:1;">
+                    <div class="card-header">
+                        <h3>Cases per Million</h3>
+                        <span class="badge-graph-type">POLAR AREA CHART</span>
+                    </div>
+                    <div class="card-body"><canvas id="chart-cases-per-million"></canvas></div>
+                </div>
+            </div>
+            <div class="content-row">
+                <div class="card" style="flex:1;">
+                    <div class="card-header">
+                        <h3>Active Cases Distribution</h3>
+                        <span class="badge-graph-type">DOUGHNUT CHART</span>
+                    </div>
+                    <div class="card-body"><canvas id="chart-active-cases"></canvas></div>
+                </div>
+                <div class="card" style="flex:1;">
+                    <div class="card-header">
+                        <h3>Death Rate Comparison</h3>
+                        <span class="badge-graph-type">RADAR CHART</span>
+                    </div>
+                    <div class="card-body"><canvas id="chart-death-rate"></canvas></div>
+                </div>
+            </div>
+            <div class="content-row">
+                <div class="card card-table" style="flex:1;">
+                    <div class="card-header">
+                        <h3>Full Country Data</h3>
+                        <span class="badge-graph-type">TABLE HEATMAP</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-wrapper">
+                            <table id="country-full-table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-left">Country</th>
+                                        <th class="text-left">Continent</th>
+                                        <th class="text-right">Population</th>
+                                        <th class="text-right">Total Cases</th>
+                                        <th class="text-right">Total Deaths</th>
+                                        <th class="text-right">Recovered</th>
+                                        <th class="text-right">Active Cases</th>
+                                        <th class="text-right">Cases/Million</th>
+                                        <th class="text-center">Death Rate (%)</th>
+                                        <th class="text-center">Recovery Rate (%)</th>
+                                        <th class="text-center">Vaccination (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="country-full-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== VIEW: VACCINATION ANALYSIS ===== -->
+        <section class="view" id="view-vaccination">
+            <div class="view-header-bar">
+                <h2>Vaccination Analysis</h2>
+                <p>Global vaccination coverage and progress tracking</p>
+            </div>
+            <div class="content-row">
+                <div class="card" style="flex:1;">
+                    <div class="card-header">
+                        <h3>Vaccination Rate by Country</h3>
+                        <span class="badge-graph-type">AREA LINE CHART</span>
+                    </div>
+                    <div class="card-body"><canvas id="chart-vacc-country"></canvas></div>
+                </div>
+                <div class="card" style="flex:1;">
+                    <div class="card-header">
+                        <h3>Vaccination vs Death Rate</h3>
+                        <span class="badge-graph-type">SCATTER CHART</span>
+                    </div>
+                    <div class="card-body"><canvas id="chart-vacc-vs-death"></canvas></div>
+                </div>
+            </div>
+            <div class="content-row">
+                <div class="card" style="flex:2;">
+                    <div class="card-header">
+                        <h3>Vaccination Coverage Distribution</h3>
+                        <span class="badge-graph-type">VERTICAL BAR CHART</span>
+                    </div>
+                    <div class="card-body"><canvas id="chart-vacc-distribution"></canvas></div>
+                </div>
+                <div class="card card-gauge" style="flex:1;">
+                    <div class="card-header">
+                        <h3>Global Vaccination</h3>
+                        <span class="badge-graph-type">GAUGE CHART</span>
+                    </div>
+                    <div class="card-body gauge-body">
+                        <canvas id="chart-vacc-gauge"></canvas>
+                        <div class="gauge-label">
+                            <span class="gauge-value" id="vacc-gauge-value">—</span>
+                            <span class="gauge-sub">Average Rate</span>
+                        </div>
+                        <div class="gauge-range"><span>0%</span><span>100%</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== VIEW: POPULATION ANALYSIS ===== -->
+        <section class="view" id="view-population">
+            <div class="view-header-bar">
+                <h2>Population Analysis</h2>
+                <p>Population distribution and COVID impact correlation</p>
+            </div>
+            <div class="content-row">
+                <div class="card" style="flex:1;">
+                    <div class="card-header">
+                        <h3>Population by Continent</h3>
+                        <span class="badge-graph-type">DOUGHNUT CHART</span>
+                    </div>
+                    <div class="card-body"><canvas id="chart-pop-continent"></canvas></div>
+                </div>
+                <div class="card" style="flex:1;">
+                    <div class="card-header">
+                        <h3>Population vs Total Cases</h3>
+                        <span class="badge-graph-type">SCATTER CHART</span>
+                    </div>
+                    <div class="card-body"><canvas id="chart-pop-vs-cases"></canvas></div>
+                </div>
+            </div>
+            <div class="content-row">
+                <div class="card" style="flex:1;">
+                    <div class="card-header">
+                        <h3>Top Countries by Population</h3>
+                        <span class="badge-graph-type">HORIZONTAL BAR CHART</span>
+                    </div>
+                    <div class="card-body"><canvas id="chart-pop-top"></canvas></div>
+                </div>
+                <div class="card" style="flex:1;">
+                    <div class="card-header">
+                        <h3>Cases per Million vs Vaccination</h3>
+                        <span class="badge-graph-type">SCATTER CHART</span>
+                    </div>
+                    <div class="card-body"><canvas id="chart-cpm-vacc"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== VIEW: ABOUT ===== -->
+        <section class="view" id="view-about">
+            <div class="view-header-bar">
+                <h2>About Dashboard</h2>
+                <p>Information about data sources and methodology</p>
+            </div>
+            <div class="content-row">
+                <div class="card" style="flex:1; max-width: 800px;">
+                    <div class="card-body about-content">
+                        <h3>📊 COVID-19 Global Dashboard</h3>
+                        <p>This dashboard provides a comprehensive visualization of COVID-19 impact data across 25 countries worldwide. It includes interactive charts, maps, and filters to explore pandemic statistics.</p>
+
+                        <h4>Data Sources</h4>
+                        <ul>
+                            <li><strong>Our World in Data</strong> — COVID-19 dataset</li>
+                            <li><strong>Johns Hopkins University</strong> — CSSE COVID-19 Data</li>
+                        </ul>
+
+                        <h4>Features</h4>
+                        <ul>
+                            <li>Interactive world map with case distribution</li>
+                            <li>Multi-dimensional filtering (continent, country, population, vaccination)</li>
+                            <li>Comparative charts across countries and continents</li>
+                            <li>Country-level summary with key metrics</li>
+                            <li>Vaccination progress tracking</li>
+                        </ul>
+
+                        <h4>Technology</h4>
+                        <ul>
+                            <li>Chart.js for interactive charts</li>
+                            <li>Leaflet.js for map visualization</li>
+                            <li>PapaParse for CSV data processing</li>
+                            <li>Vanilla CSS with custom design system</li>
+                        </ul>
+
+                        <div class="about-footer">
+                            <p>Designed by <strong>Rajan Nishad</strong></p>
+                            <p class="about-sources">Source: <a href="https://ourworldindata.org/" target="_blank">Our World in Data</a> | <a href="https://github.com/CSSEGISandData/COVID-19" target="_blank">Johns Hopkins University</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Source: <a href="https://ourworldindata.org/" target="_blank">Our World in Data</a> | <a href="https://github.com/CSSEGISandData/COVID-19" target="_blank">Johns Hopkins University</a></p>
+            <p>Designed by <strong>Rajan Nishad</strong></p>
+        </footer>
+    </main>
+
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+    <!-- App Modules -->
+    <script src="js/data.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
