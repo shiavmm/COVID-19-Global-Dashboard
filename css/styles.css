@@ -489,21 +489,26 @@ select, input {
     max-width: 260px;
 }
 
-/* Chart row */
-.row-charts {
-    min-height: 320px;
+/* Chart rows */
+.row-charts-top {
+    min-height: 380px;
+}
+
+.row-charts-bottom {
+    min-height: 380px;
+    margin-top: var(--gap);
 }
 
 .card-bar-h {
-    flex: 1;
+    flex: 1.35;
 }
 
 .card-bar-v {
-    flex: 0.85;
+    flex: 1;
 }
 
 .card-line {
-    flex: 1.3;
+    flex: 1;
 }
 
 /* Bottom row */
