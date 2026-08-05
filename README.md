@@ -127,4 +127,4 @@ To run this project locally, you only need a simple HTTP server (such as Node.js
 
 ## 👤 Author
 
-Designed and developed by **Rajan Nishad** & **shiavmm**.
+Designed and developed by **Shivam Pal**.
