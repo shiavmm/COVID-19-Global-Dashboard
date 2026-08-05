@@ -96,21 +96,6 @@ Egypt,EGY,Africa,112000000,520000,25000,442000,38,4643,4.81,85.00,53000`;
     /** Parse CSV from a URL with automatic inline fallback for local file:// mode */
     function loadCSV(url) {
         return new Promise((resolve) => {
-            Papa.parse(url, {
-                download: true,
-                header: true,
-                dynamicTyping: true,
-                skipEmptyLines: true,
-                complete: (results) => {
-                    if (results.data && results.data.length > 0 && results.data[0].Country) {
-                        resolve(processParsedData(results.data));
-                    } else {
-                        parseEmbedded();
-                    }
-                },
-                error: () => parseEmbedded()
-            });
-
             function parseEmbedded() {
                 Papa.parse(EMBEDDED_CSV_DATA, {
                     header: true,
@@ -118,6 +103,35 @@ Egypt,EGY,Africa,112000000,520000,25000,442000,38,4643,4.81,85.00,53000`;
                     skipEmptyLines: true,
                     complete: (res) => resolve(processParsedData(res.data))
                 });
+            }
+
+            // In local file:// mode, immediately parse embedded data to prevent browser CORS/XHR blocks
+            if (window.location.protocol === 'file:') {
+                parseEmbedded();
+                return;
+            }
+
+            try {
+                Papa.parse(url, {
+                    download: true,
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    complete: (results) => {
+                        try {
+                            if (results && results.data && results.data.length > 0 && results.data[0] && results.data[0].Country) {
+                                resolve(processParsedData(results.data));
+                            } else {
+                                parseEmbedded();
+                            }
+                        } catch (e) {
+                            parseEmbedded();
+                        }
+                    },
+                    error: () => parseEmbedded()
+                });
+            } catch (err) {
+                parseEmbedded();
             }
         });
     }
