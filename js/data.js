@@ -232,25 +232,6 @@ Egypt,EGY,Africa,112000000,520000,25000,442000,38,4643,4.81,85.00,53000`;
         }));
     }
 
-    /** Generate 2019-2026 yearly case trends showing increase and decrease trajectory */
-    function getCaseTrendsSeries(data) {
-        const totalCases = data.reduce((s, r) => s + (r.Total_Cases || 0), 0);
-        const years = [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
-        const factors = [0.001, 0.02, 0.15, 0.45, 0.72, 0.88, 0.96, 1.00];
-
-        let prevCumulative = 0;
-        return years.map((year, i) => {
-            const cumulative = Math.round(totalCases * factors[i]);
-            const newCases = i === 0 ? cumulative : Math.max(0, cumulative - prevCumulative);
-            prevCumulative = cumulative;
-            return {
-                year,
-                cumulative,
-                newCases
-            };
-        });
-    }
-
     /** Population by continent */
     function getPopulationByContinent(data) {
         const map = {};
@@ -279,7 +260,6 @@ Egypt,EGY,Africa,112000000,520000,25000,442000,38,4643,4.81,85.00,53000`;
         getTopCountries,
         getVaccinationByContinent,
         getTimeSeries,
-        getCaseTrendsSeries,
         getPopulationByContinent,
         getUnique,
         getRawData
