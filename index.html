@@ -203,6 +203,7 @@
                             <label for="filter-year">Year</label>
                             <select id="filter-year">
                                 <option value="All">All</option>
+                                <option value="2019">2019</option>
                                 <option value="2020">2020</option>
                                 <option value="2021">2021</option>
                                 <option value="2022">2022</option>
@@ -247,6 +248,19 @@
                     </div>
                     <div class="card-body">
                         <canvas id="chart-timeline"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3.5: Case Increase & Decrease Trends (2019-2026) -->
+            <div class="content-row row-trends" style="min-height: 320px;">
+                <div class="card card-trends" id="card-trends" style="flex:1;">
+                    <div class="card-header">
+                        <h3>Case Increase & Decrease Trends (2019–2026)</h3>
+                        <span class="badge-graph-type">TREND COMBO CHART</span>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="chart-trends"></canvas>
                     </div>
                 </div>
             </div>

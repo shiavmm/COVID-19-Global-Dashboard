@@ -909,11 +909,115 @@ const ChartsModule = (() => {
         });
     }
 
+    /* ----- Case Increase & Decrease Trends (2019–2026) ----- */
+    function renderCaseTrends(canvasId, trendData) {
+        destroyChart(canvasId);
+        const labels = trendData.map(d => d.year);
+        const newCasesData = trendData.map(d => d.newCases);
+        const cumulativeData = trendData.map(d => d.cumulative);
+
+        // Color bars: Surge years (2019-2022) in red/coral, Declining/stabilizing years (2023-2026) in emerald/green
+        const barColors = trendData.map((d, idx) => {
+            if (idx <= 3) return 'rgba(239, 68, 68, 0.8)'; // Red/coral for surge increase
+            return 'rgba(16, 185, 129, 0.8)'; // Green for slowdown/decrease
+        });
+
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        instances[canvasId] = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        type: 'bar',
+                        label: 'Annual New Cases (Yearly Increase / Decrease)',
+                        data: newCasesData,
+                        backgroundColor: barColors,
+                        borderRadius: 6,
+                        barPercentage: 0.55,
+                        order: 2,
+                        yAxisID: 'yNew'
+                    },
+                    {
+                        type: 'line',
+                        label: 'Cumulative Total Cases',
+                        data: cumulativeData,
+                        borderColor: '#3B82F6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                        fill: true,
+                        tension: 0.35,
+                        borderWidth: 3,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#3B82F6',
+                        pointBorderColor: '#ffffff',
+                        pointHoverRadius: 8,
+                        order: 1,
+                        yAxisID: 'yTotal'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { boxWidth: 12, font: { size: 11, family: "'Inter', sans-serif" }, color: '#475569' }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => ` ${ctx.dataset.label}: ${formatNum(ctx.raw)}`
+                        }
+                    },
+                    datalabels: {
+                        formatter: (v, ctx) => {
+                            if (ctx.datasetIndex === 0 && v > 0) return formatNum(v);
+                            return '';
+                        },
+                        anchor: 'end',
+                        align: 'top',
+                        font: { size: 9, weight: 600, family: "'Inter', sans-serif" },
+                        color: '#475569'
+                    }
+                },
+                scales: {
+                    yNew: {
+                        type: 'linear',
+                        position: 'left',
+                        beginAtZero: true,
+                        title: { display: true, text: 'Annual New Cases (Increase/Decrease)', font: { size: 11, weight: 500, family: "'Inter', sans-serif" }, color: '#64748B' },
+                        ticks: { callback: v => formatNum(v), font: { size: 10 }, color: '#94A3B8' },
+                        grid: { color: '#F1F5F9' },
+                        border: { display: false }
+                    },
+                    yTotal: {
+                        type: 'linear',
+                        position: 'right',
+                        beginAtZero: true,
+                        title: { display: true, text: 'Cumulative Total Cases', font: { size: 11, weight: 500, family: "'Inter', sans-serif" }, color: '#3B82F6' },
+                        ticks: { callback: v => formatNum(v), font: { size: 10 }, color: '#3B82F6' },
+                        grid: { display: false },
+                        border: { display: false }
+                    },
+                    x: {
+                        title: { display: true, text: 'Year (2019 – 2026)', font: { size: 11, weight: 500, family: "'Inter', sans-serif" }, color: '#64748B' },
+                        ticks: { font: { size: 11, weight: 600 }, color: '#475569' },
+                        grid: { display: false },
+                        border: { display: false }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    }
+
     return {
         renderDonut,
         renderTopCountries,
         renderVaccContinent,
         renderTimeline,
+        renderCaseTrends,
         renderGauge,
         renderCountryCompare,
         renderCasesPerMillion,

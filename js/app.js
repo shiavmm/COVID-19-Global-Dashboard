@@ -206,6 +206,10 @@
         const timeSeries = DataModule.getTimeSeries(data);
         ChartsModule.renderTimeline('chart-timeline', timeSeries);
 
+        // Case Increase & Decrease Trends (2019-2026)
+        const trendsSeries = DataModule.getCaseTrendsSeries(data);
+        ChartsModule.renderCaseTrends('chart-trends', trendsSeries);
+
         // Summary table
         renderSummaryTable(data);
 
